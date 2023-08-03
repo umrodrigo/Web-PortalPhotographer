@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdmModule } from './adm.module';
+import { AdmComponent } from './adm.component';
 
 const routes: Routes = [
-  { path: '', component: AdmModule },
-  { path: '/indicadores', loadChildren: () => import('./sub-pages/indicators/indicators.module').then(m => m.IndicatorsModule) },
+  { path: '', component: AdmComponent },
+  { path: 'indicadores', loadChildren: () => import('./sub-pages/indicators/indicators.module').then(m => m.IndicatorsModule) },
 
 ];
 

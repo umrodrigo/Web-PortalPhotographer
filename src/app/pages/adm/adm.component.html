@@ -1,12 +1,25 @@
-<!-- Conteúdo comum da área administrativa que aparecerá em todas as páginas -->
 <h1>Administração</h1>
 <nav>
   <ul>
     <li><a routerLink="/adm/indicadores">Indicadores</a></li>
-    <!-- Adicione outros links para as sub-rotas aqui -->
   </ul>
 </nav>
 
-<!-- Aqui é onde o conteúdo da sub-rota será renderizado -->
-<router-outlet></router-outlet>
+<p>Carregue as fotos para o carrossel</p>
+
+<label for="avatar">Selecione o arquivo:</label>
+
+<input type="file" id="selectImage" name="selectImage" accept="image/jpeg" 
+  (change)="onFileChange($event)" multiple
+/>
+
+<p>Lista de fotos</p>
+<div *ngIf="listImageFile && listImageFile.length > 0">
+  <div *ngFor="let img of listImageFile">
+    <img [src]="img.url" [alt]="img.type" class="previaImg">
+    <p>Tipo: {{ img.type }}</p>
+    <p>Nome: {{ img.name }}</p>
+  </div>
+</div>
+
 
