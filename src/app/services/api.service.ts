@@ -1,8 +1,8 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { FormatterService } from './formatter.service';
+import { BuildFormDataService } from './buildFormData.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ import { FormatterService } from './formatter.service';
 export class ApiService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private formatter: FormatterService) { }
+  constructor(private http: HttpClient, private buildFormData: BuildFormDataService) { }
 
   private createHeaders(): HttpHeaders {
     // Aqui você pode adicionar headers personalizados, se necessário
@@ -57,11 +57,17 @@ export class ApiService {
     }
   }
 
-  saveBlob<T>(endpoint: string, body: object): Observable<T> {
-    //const headers = this.createHeaders();
-    const blob = this.formatter.buildFormData(body);
-    return this.post<T>(endpoint, blob);
-    //return this.http.post<T>(`${this.apiUrl}/${endpoint}`, blob, { headers })
+  saveBlob<T>(endpoint: string, body: object): Observable<HttpEvent<T>> {
+    const headers = this.createHeaders();
+    headers.append("Content-type", "undefined");
+    return this.http.post<T>(
+      `${this.apiUrl}${endpoint}`, 
+      body, 
+      { 
+        headers, 
+        reportProgress: true,
+        observe: 'events'
+      });
   }
 }
 

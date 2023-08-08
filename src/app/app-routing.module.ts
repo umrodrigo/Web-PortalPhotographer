@@ -13,7 +13,7 @@ const routes: Routes = [
       { path: 'home', loadChildren: () => import('./pages/public/home/home.module').then(m => m.HomeModule) },
       { path: 'bio', loadChildren: () => import('./pages/public/bio/bio.module').then(m => m.BioModule) },
       { path: 'depoimento', loadChildren: () => import('./pages/public/depoimento/depoimento.module').then(m => m.DepoimentoModule) },
-      { path: 'servicos', loadChildren: () => import('./pages/public/servicos/servicos.module').then(m => m.ServicosModule) },
+      { path: 'produtos', loadChildren: () => import('./pages/public/produtos/produtos.module').then(m => m.ProdutosModule) },
     ],
   },
   { 

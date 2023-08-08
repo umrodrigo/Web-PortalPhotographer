@@ -1,45 +1,45 @@
+import { IEntityPhoto } from './../models/entityPhoto.interface';
 import { Injectable } from '@angular/core';
-import { ImageFile } from '../models/image-file.interface';
+import { IFileData } from '../models/fileData.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
-  //imgBlobList: Array<ImageFile> = [];
 
   constructor() { }
 
-  private async processImageToBlob(file: File): Promise<ImageFile> {
-    return new Promise<ImageFile>((resolve, reject) => {
+  private async processFileToBlob(file: File): Promise<IFileData> {
+    return new Promise<IFileData>((resolve, reject) => {
       const reader = new FileReader();
 
       reader.onload = (event: any) => {
         const blob = new Blob([new Uint8Array(event.target.result)], { type: file.type });
-        const imageFile: ImageFile = {
+        const FileData: IFileData = {
           file: blob,
           type: file.type,
           url: URL.createObjectURL(blob),
-          name: file.name
+          extension: file.name.split(".").pop()
         };
-        resolve(imageFile);
+        resolve(FileData);
       };
 
-      reader.onerror = (error) => {
-        reject(error);
-      };
+      reader.onerror = (error) => reject(error);
 
       reader.readAsArrayBuffer(file);
     });
   }
 
-  async processListImageFile(images: FileList): Promise<ImageFile[]> {
-    let imgBlobList: ImageFile[] = [];
-
-    for (let i = 0; i < images.length; i++) {
-      let result = await this.processImageToBlob(images[i]);
+  async createEntityPhoto(list: FileList): Promise<IEntityPhoto[]> {
+    let photoList: IEntityPhoto[] = [];
+    for (let i = 0; i < list.length; i++) {
+      let result = await this.processFileToBlob(list[i]);
       if (result)
-        imgBlobList.push(result);
+        photoList.push({
+          FileData: result
+        } as IEntityPhoto)
     }
-    return imgBlobList;
+    return photoList;
   }
+  
 }

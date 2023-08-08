@@ -1,8 +1,10 @@
+import { HttpEventType } from '@angular/common/http';
 import { ImageService } from './../../services/image.service';
 import { Component } from '@angular/core';
-import { ImageFile } from 'src/app/models/image-file.interface';
+import { IFileData } from 'src/app/models/fileData.interface';
 import { ApiService } from 'src/app/services/api.service';
-import { FormatterService } from 'src/app/services/formatter.service';
+import { BuildFormDataService } from 'src/app/services/buildFormData.service';
+import { IEntityPhoto } from 'src/app/models/entityPhoto.interface';
 
 @Component({
   selector: 'app-adm',
@@ -10,25 +12,39 @@ import { FormatterService } from 'src/app/services/formatter.service';
   styleUrls: ['./adm.component.css']
 })
 export class AdmComponent {
-  buffer!: ArrayBuffer;
-  selectedImages!: FileList | null;
-  listImageFile: ImageFile[] = [];
+  listFileInput!: FileList | null;
+  listEntityPhoto: IEntityPhoto[] = [];
 
-  constructor(private imageService: ImageService, private api: ApiService) {}
+  constructor(
+    private imageService: ImageService,
+    private api: ApiService,
+    private buildFormData: BuildFormDataService
+    ) {}
 
   onFileChange(event: Event): void {
     let input = event.target as HTMLInputElement;
-    this.selectedImages = input.files;
-    this.convertFilesToBlobs();
-  }
-  
-  async convertFilesToBlobs(): Promise<void> {
-    if (this.selectedImages && this.selectedImages.length > 0) {
-      this.listImageFile = await this.imageService.processListImageFile(this.selectedImages);
-    }
+    this.listFileInput = input.files;
+    this.createBlobAndEntity();
   }
 
-  sendIMG() {
-    this.api.saveBlob("caminho", { file: this.buffer })
+  async createBlobAndEntity() {
+    if (this.listFileInput && this.listFileInput.length > 0)
+      this.listEntityPhoto = await this.imageService.createEntityPhoto(this.listFileInput);
+  }
+
+  saveListFileData() {
+    let list = this.buildFormData.buildFormData(this.listEntityPhoto);
+    this.api.saveBlob("photo/postBlob", list)
+      .subscribe(event => {
+        if (event.type === HttpEventType.UploadProgress) {
+          // Evento de progresso
+          const percentDone = Math.round(100 * event.loaded / event.total!);
+          console.log('Progresso: ' + percentDone + '%');
+        } else if (event.type === HttpEventType.Response) {
+          // Evento de resposta completa
+          console.log('Upload completo!', event.body);
+        }
+      }
+    );
   }
 }
